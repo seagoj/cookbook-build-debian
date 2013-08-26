@@ -35,26 +35,33 @@ execute "Begin Debianization" do
     command "cd /vagrant/php-5.5.2 && dh_make --single -e seagoj@gmail.com -f ../php-5.5.2.tar.bz2"
 end
 
-unless File.exists?("/vagrant/files/default/dependencies")
-    execute "Find dependencies" do
-        cwd "/vagrant/php-5.5.2"
-        user "root"
-        command "dpkg-depcheck -d ./configure --prefix=/usr --sysconfdir=/etc --with-config-file-path=/etc --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --enable-opcache --enable-mbstring --enable-mbregex --enable-zip --with-mysqli --with-openssl --with-curl --with-zlib --enable-pcntl >> ../files/default/dependencies"
-    end
-end
-
-cookbook_file "/vagrant/php-5.5.2/debian/control" do
-    source "control"
-end
-
-execute "Build Debian File" do
+execute "Find dependencies" do
     cwd "/vagrant/php-5.5.2"
     user "root"
-    command "dpkg-buildpackage -rfakeroot"
+    command "dpkg-depcheck -d ./configure --prefix=/usr --sysconfdir=/etc --with-config-file-path=/etc --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --enable-opcache --enable-mbstring --enable-mbregex --enable-zip --with-mysqli --with-openssl --with-curl --with-zlib --enable-pcntl >> ../dependencies"
 end
 
-execute "Testing package" do
-    cwd "/vagrant"
-    user "root"
-    command "lintian -Ivi php-5.5.2.changes"
-end
+depends = File.open("/vagrant/dependencies").read
+control = File.open("/vagrant/files/default/control").read
+depHeader = "Packages needed:\n"
+conHeader = "Build-Depends: "
+
+append = ", " + depends.slice(depends.rindex(depHeader)+depHeader.length, depends.length).split("\n").each{|d| d.strip!}.join(", ")
+newControl = control.insert(control.index("\n", control.index(conHeader)+conHeader.length), append)
+File.open("/vagrant/php-5.5.2/debian/control", "w") { |file| file.write(newControl) }
+
+#cookbook_file "/vagrant/php-5.5.2/debian/control" do
+#    source "control"
+#end
+
+#execute "Build Debian File" do
+#    cwd "/vagrant/php-5.5.2"
+#    user "root"
+#    command "dpkg-buildpackage -rfakeroot"
+#end
+
+#execute "Testing package" do
+#    cwd "/vagrant"
+#    user "root"
+#    command "lintian -Ivi php-5.5.2.changes"
+#end
