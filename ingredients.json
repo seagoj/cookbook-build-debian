@@ -1,4 +1,0 @@
-{
-    "apt": "git://github.com/seagoj/cookbook-apt.git",
-    "php-build": "git://github.com/seagoj/cookbook-build-php.git"
-}
