@@ -1,8 +1,15 @@
 # --- Install packages we need ---
-%w(build-essential autoconf automake make autotools-dev dh-make debhelper devscripts fakeroot xutils lintian pbuilder bison libxml2 libxml2-dev libcurl3 libcurl4-gnutls-dev libmagic-dev curl).each do |p|
+require 'rubygems'
+require 'json'
+packages = %w(build-essential autoconf automake make autotools-dev dh-make debhelper devscripts fakeroot xutils lintian pbuilder)
+
+packages += JSON.parse(open("/vagrant/packages.json").read) if File.exists?("/vagrant/packages.json")
+
+packages.each do |p|
     package p
 end
 
+# Reuse or pull down source archive
 if File.exists?("/vagrant/php_5.5.2.orig.tar.bz2")
     execute "Cleanup" do
         cwd "/vagrant"
