@@ -6,7 +6,7 @@ packages += JSON.parse(open("/vagrant/packages.json").read) if File.exists?("/va
 packages.each{ |p| package p }
 
 builds = `ls /vagrant/*.tgz`+`ls /vagrant/*.tar.gz`+`ls /vagrant/*.bz2`
-puts builds
+puts builds.split("\n")
 
 %w(php-5.5.2 php-5.5.2.tar.bz2 dependencies php_5.5.2-1.debian.tar.gz).each do |f|
     if File.exists?("/vagrant/#{f}")
