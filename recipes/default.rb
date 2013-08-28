@@ -5,7 +5,7 @@ packages = %w(checkinstall automake build-essential make auto-apt)
 packages += JSON.parse(open("/vagrant/packages.json").read) if File.exists?("/vagrant/packages.json")
 packages.each{ |p| package p }
 
-builds = `ls /vagrant/*.tgz`+`ls /vagrant/*.tar.gz`+`ls /vagrant/*.bz2`
+builds = `ls /vagrant/*.tgz > /dev/null`+`ls /vagrant/*.tar.gz > /dev/null`+`ls /vagrant/*.bz2 > /dev/null`
 puts builds.split("\n")
 
 %w(php-5.5.2 php-5.5.2.tar.bz2 dependencies php_5.5.2-1.debian.tar.gz).each do |f|
