@@ -16,6 +16,8 @@ extensions.each do |ext|
     end
 end
 
+puts builds
+
 builds.each do |build|
     if File.exists?("/vagrant/#{build[:project]}")
         execute "Cleanup #{build[:project]}" do
