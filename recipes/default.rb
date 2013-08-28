@@ -1,11 +1,14 @@
 # --- Install packages we need ---
 require 'rubygems'
 require 'json'
-packages = %w(checkinstall automake build-essential make lintian auto-apt)
+packages = %w(checkinstall automake build-essential make auto-apt)
 packages += JSON.parse(open("/vagrant/packages.json").read) if File.exists?("/vagrant/packages.json")
 packages.each{ |p| package p }
 
-%w(php-5.5.2 php-5.5.2.tar.bz2 dependencies php_5.5.2-1.debian.tar.gz php_5.5.2-1.dsc).each do |f|
+builds = `ls *.tgz`+`ls *.tar.gz`+`ls *.bz2`
+puts builds
+
+%w(php-5.5.2 php-5.5.2.tar.bz2 dependencies php_5.5.2-1.debian.tar.gz).each do |f|
     if File.exists?("/vagrant/#{f}")
         execute "Cleanup #{f}" do
             cwd "/vagrant"
@@ -67,9 +70,3 @@ execute "Move Debian" do
     user "root"
     command "mv *.deb .."
 end
-
-#execute "Testing package" do
-#    cwd "/vagrant"
-#    user "root"
-#    command "lintian -Ivi php-5.5.2.changes"
-#end
