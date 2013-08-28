@@ -1,7 +1,7 @@
 # --- Install packages we need ---
 require 'rubygems'
 require 'json'
-packages = %w(checkinstall automake build-essential make lintian)
+packages = %w(checkinstall automake build-essential make lintian auto-apt)
 packages += JSON.parse(open("/vagrant/packages.json").read) if File.exists?("/vagrant/packages.json")
 packages.each{ |p| package p }
 
