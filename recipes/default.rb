@@ -62,6 +62,12 @@ execute "Build" do
     timeout 7200
 end
 
+execute "Move Debian" do
+    cwd "/vagrant/php-5.5.2"
+    user "root"
+    command "mv *.deb .."
+end
+
 #execute "Testing package" do
 #    cwd "/vagrant"
 #    user "root"
