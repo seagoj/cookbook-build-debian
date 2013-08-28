@@ -18,7 +18,7 @@ end
 
 builds.each do |build|
     if File.exists?("/vagrant/#{build[:project]}")
-        execute "Cleanup #{build[:project}" do
+        execute "Cleanup #{build[:project]}" do
             cwd "/vagrant"
             user "root"
             command "rm -r #{build[:project]}"
