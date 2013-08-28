@@ -10,9 +10,10 @@ extensions = ['.tgz', '.tar.gz', '.bz2']
 builds = {}
 extensions.each do |ext|
     glob = Dir.glob("*#{ext}")
+    puts glob
     glob.each do |g|
         project = g.slice(0,ext.length)
-        builds += {:archive=>g, :project=>project, :config=>config[project], :source=>""}
+        builds.merge!({:archive=>g, :project=>project, :config=>config[project], :source=>""})
     end
 end
 
