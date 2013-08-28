@@ -47,7 +47,7 @@ execute "Make" do
     command "make"
 end
 
-exectue "Make Test" do
+execute "Make Test" do
     cwd "/vagrant/php-5.5.2"
     user "root"
     command "make test"
