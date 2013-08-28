@@ -45,18 +45,21 @@ execute "Make" do
     cwd "/vagrant/php-5.5.2"
     user "root"
     command "make"
+    timeout 7200
 end
 
 execute "Make Test" do
     cwd "/vagrant/php-5.5.2"
     user "root"
     command "make test"
+    timeout 7200
 end
 
 execute "Build" do
     cwd "/vagrant/php-5.5.2"
     user "root"
     command "checkinstall"
+    timeout 7200
 end
 
 #execute "Testing package" do
