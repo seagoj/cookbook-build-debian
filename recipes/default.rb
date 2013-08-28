@@ -4,69 +4,71 @@ require 'json'
 packages = %w(checkinstall automake build-essential make auto-apt)
 packages += JSON.parse(open("/vagrant/packages.json").read) if File.exists?("/vagrant/packages.json")
 packages.each{ |p| package p }
+config = JSON.parse(open("/vagrant/config.json").read) if File.exists?("/vagrant/config.json")
 
-builds = `ls /vagrant/*.tgz > /dev/null`+`ls /vagrant/*.tar.gz > /dev/null`+`ls /vagrant/*.bz2 > /dev/null`
-puts builds.split("\n")
+extensions = ['.tgz', '.tar.gz', '.bz2']
+builds = {}
+extensions.each do |ext|
+    glob = Dir.glob("*#{ext}")
+    glob.each do |g|
+        project = g.slice(0,ext.length)
+        builds += {archive: g, project: project, config: config[project], source: ""}
+    end
+end
 
-%w(php-5.5.2 php-5.5.2.tar.bz2 dependencies php_5.5.2-1.debian.tar.gz).each do |f|
-    if File.exists?("/vagrant/#{f}")
-        execute "Cleanup #{f}" do
+builds.each do |build|
+    if File.exists?("/vagrant/#{build[:project}")
+        execute "Cleanup #{build[:project}" do
             cwd "/vagrant"
             user "root"
-            command "rm -r #{f}"
+            command "rm -r #{build[:project]}"
         end
     end
-end
 
-# Reuse or pull down source archive
-if File.exists?("/vagrant/php_5.5.2.orig.tar.bz2")
-    execute "Reuse php_5.5.2.orig.tar.bz2" do
-            cwd "/vagrant"
-            user "root"
-            command "mv php_5.5.2.orig.tar.bz2 php-5.5.2.tar.bz2"
+    # Reuse or pull down source archive
+    unless build[:archive].exists?
+        remote_file build[:archive] do
+            source "build[:source]"
+            mode "0755"
+        end
     end
-else
-    remote_file "/vagrant/php-5.5.2.tar.bz2" do
-        source "http://us3.php.net/get/php-5.5.2.tar.bz2/from/us2.php.net/mirror"
-        mode "0777"
+
+    execute "Expand PHP tarball" do
+        cwd "/vagrant"
+        user "root"
+        command "tar -xvf #{build[:archive]}"
     end
-end
 
-execute "Expand PHP tarball" do
-    cwd "/vagrant"
-    user "root"
-    command "tar -xvf php-5.5.2.tar.bz2"
-end
+    execute "Configure" do
+        cwd "#{build[:project]}"
+        user "root"
+        command "auto-apt run ./configure #{build[config]}"
+    end
 
-execute "Configure" do
-    cwd "/vagrant/php-5.5.2"
-    user "root"
-    command "auto-apt run ./configure --prefix=/usr --sysconfdir=/etc --with-config-file-path=/etc --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --enable-opcache --enable-mbstring --enable-mbregex --enable-zip --with-mysqli --with-openssl --with-curl --with-zlib --enable-pcntl"
-end
+    execute "Make" do
+        cwd "#{build[:project]}"
+        user "root"
+        command "make"
+        timeout 7200
+    end
 
-execute "Make" do
-    cwd "/vagrant/php-5.5.2"
-    user "root"
-    command "make"
-    timeout 7200
-end
+    execute "Make Test" do
+        cwd "#{build[:project]}"
+        user "root"
+        command "make test"
+        timeout 7200
+    end
 
-execute "Make Test" do
-    cwd "/vagrant/php-5.5.2"
-    user "root"
-    command "make test"
-    timeout 7200
-end
+    execute "Build" do
+        cwd "#{build[:project]}"
+        user "root"
+        command "checkinstall"
+        timeout 7200
+    end
 
-execute "Build" do
-    cwd "/vagrant/php-5.5.2"
-    user "root"
-    command "checkinstall"
-    timeout 7200
-end
-
-execute "Move Debian" do
-    cwd "/vagrant/php-5.5.2"
-    user "root"
-    command "mv *.deb .."
+    execute "Move Debian" do
+        cwd "#{build[:project]}"
+        user "root"
+        command "mv *.deb .."
+    end
 end
