@@ -12,7 +12,7 @@ extensions.each do |ext|
     glob = Dir.glob("*#{ext}")
     glob.each do |g|
         project = g.slice(0,ext.length)
-        builds += {archive: g, project: project, config: config[project], source: ""}
+        builds += {:archive=>g, :project=>project, :config=>config[project], :source=>""}
     end
 end
 
