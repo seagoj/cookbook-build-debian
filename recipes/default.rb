@@ -12,7 +12,7 @@ extensions.each do |ext|
     glob.each do |g|
         project = g.slice(0,ext.length)
         include_recipe("build-debian::#{project}")
-        builds.merge!({:archive=>g, :project=>project, :config=>config, :source=>""})
+        builds.merge!({:archive=>g, :project=>project, :config=>config, :source=>source})
     end
 end
 
