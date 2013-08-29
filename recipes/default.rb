@@ -2,9 +2,7 @@
 require 'rubygems'
 require 'json'
 packages = %w(checkinstall automake build-essential make auto-apt)
-packages += JSON.parse(open("/vagrant/packages.json").read) if File.exists?("/vagrant/packages.json")
 packages.each{ |p| package p }
-config = JSON.parse(open("/vagrant/config.json").read) if File.exists?("/vagrant/config.json")
 
 extensions = ['.tgz', '.tar.gz', '.bz2']
 builds = {}
@@ -13,7 +11,8 @@ extensions.each do |ext|
     puts glob
     glob.each do |g|
         project = g.slice(0,ext.length)
-        builds.merge!({:archive=>g, :project=>project, :config=>config[project], :source=>""})
+        include_recipe("build-debian::#{project}")
+        builds.merge!({:archive=>g, :project=>project, :config=>config, :source=>""})
     end
 end
 
