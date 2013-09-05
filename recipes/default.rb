@@ -11,8 +11,9 @@ extensions.each do |ext|
     puts glob
     glob.each do |g|
         project = g.slice(0,ext.length)
-        include_recipe("build-debian::#{project}")
-        builds.merge!({:archive=>g, :project=>project, :config=>config, :source=>source})
+        include_attribute "build-debian::#{project}"
+        project = ":#{project}"
+        builds.merge!({:archive=>g, :project=>project, :config=>node[project][:config], :source=>node[project][:source]})
     end
 end
 
