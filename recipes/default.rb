@@ -74,9 +74,3 @@ execute "Build Debian File" do
     user "root"
     command "dpkg-buildpackage -rfakeroot"
 end
-
-#execute "Testing package" do
-#    cwd "/vagrant"
-#    user "root"
-#    command "lintian -Ivi php-5.5.2.changes"
-#end
