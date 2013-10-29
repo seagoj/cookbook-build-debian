@@ -1,7 +1,7 @@
 # --- Install packages we need ---
 require 'rubygems'
 require 'json'
-packages = %w(checkinstall automake build-essential make auto-apt)
+packages = %w(checkinstall automake build-essential make auto-apt libfbclient2 firebird2.5-common firebird2.5-common-doc libicu48)
 packages.each{ |p| package p }
 
 extensions = ['.tgz', '.tar.gz', '.bz2']
